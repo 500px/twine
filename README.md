@@ -8,18 +8,32 @@ Twine is a command line tool for managing your strings and their translations. T
 
 Twine is most easily installed as a Gem.
 
-	$ gem install twine
+```
+$ gem install twine
+```
 
 ### From Source
 
 You can also run Twine directly from source. However, it requires [rubyzip][rubyzip] in order to create and read standard zip files.
 
-	$ gem install rubyzip
-	$ git clone git://github.com/mobiata/twine.git
-	$ cd twine
-	$ ./twine --help
+```
+$ gem install rubyzip
+$ git clone https://github.com/thefabulous/twine
+$ cd twine
+$ ./twine --help
+```
 
 Make sure you run the `twine` executable at the root of the project as it properly sets up your Ruby library path. The `bin/twine` executable does not.
+
+You can install the downloaded version in your Mac OSX with:
+
+```
+$ cd twine
+$ gem build twine.gemspec
+$ gem install twine
+```
+
+The last command will first try to install the gem built locally.
 
 ## Twine File Format
 

@@ -16,9 +16,7 @@ module Twine
       end
 
       def can_handle_file?(path)
-        path_arr = path.split(File::SEPARATOR)
-        file_name = path_arr[path_arr.length - 1]
-        return file_name == default_file_name || file_name == default_plural_file_name
+        return File.extname(path) == ".strings" || File.extname(path) == ".stringsdict"
       end
 
       def default_file_name
@@ -45,12 +43,8 @@ module Twine
         return
       end
 
-      def output_path_for_language(lang)
-        if lang == 'en'
-          "Base.lproj"
-        else
-          "#{lang}.lproj"
-        end
+       def output_path_for_language(lang)
+        "#{lang}.lproj"
       end
 
       def read(io, lang)
@@ -133,8 +127,9 @@ module Twine
       def plural_input_file_for_lang(lang)
         path = @options[:input_path]
         if path.include?(output_path_for_language(lang))
-          if path.include?(default_file_name)
-            path.sub(default_file_name, default_plural_file_name)
+          if File.extname(path) == ".strings"
+            filename = File.basename(path,".*")
+            path.sub(filename + ".strings", filename + ".stringsdict")
           else
             path + "/" + default_plural_file_name
           end
@@ -146,8 +141,9 @@ module Twine
       def plural_output_file_for_lang(lang)
         path = @options[:output_path]
         if path.include?(output_path_for_language(lang))
-          if path.include?(default_file_name)
-            path.sub(default_file_name, default_plural_file_name)
+          if File.extname(path) == ".strings"
+            filename = File.basename(path,".*")
+            path.sub(filename + ".strings", filename + ".stringsdict")
           else
             path + "/" + default_plural_file_name
           end
@@ -161,8 +157,8 @@ module Twine
       end
 
       def format_sections(twine_file, lang)
-        first_plural = true
         out_file = File.open(plural_output_file_for_lang(lang), "w")
+        out_file.puts(format_header_stringsdict)
 
         sections = Array.new(twine_file.sections.size)
         for i in 0 ... twine_file.sections.size
@@ -170,10 +166,6 @@ module Twine
           if section.is_uncategorized
             sections[i] = format_section(section, lang)
           else
-            if first_plural
-              first_plural = false
-              out_file.puts(format_header_stringsdict)
-            end
             format_section_plural(section, lang, out_file)
           end
         end
